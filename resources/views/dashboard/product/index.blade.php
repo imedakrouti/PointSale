@@ -25,9 +25,8 @@
             <div class="card card-primary card-outline">
               <div class="card-header">
               <h3 class="card-title mb-2"><i class="fa fa-product"></i> @lang('site.products')
-                @if($products->total() > 0 )
-                <span class="badge badge-info mx-2" >{{$products->total()}}</span>
-                @endif
+
+                <span class="badge badge-info mx-2" >{{ $products->count()>0 ? $products->count():''}}</span>
                 @if (auth::user()->hasPermission('create_products'))
                 <a href="{{route('dashboard.product.create')}}" class="btn btn-success float-left  rounded "><i class="fa fa-plus mx-1"></i>@lang('site.add')</a>
                 @else
@@ -41,7 +40,15 @@
                 <form action="{{ route('dashboard.product.index')}}"method="GET">
                     <div class="row">
                       <div class="">
-                      <input type="text" name="table_search" class="form-control float-right" placeholder="@lang('site.search')"value="{{old('table_search')}}">
+                      <input type="text" name="table_search" class="form-control float-right" placeholder="@lang('site.search')"value="{{request()->table_search}}">
+                      </div>
+                          <div class="form-group col-md-4">
+                              <select id="category_id" class="form-control" name="category_id">
+                                  <option value="">@lang('site.all_categories')</option>
+                                  @foreach($categories as $category)
+                                  <option value='{{ $category->id }}' {{ request()->category_id== $category->id ? 'selected' :'' }}>{{ $category->name }}</option>
+                                  @endforeach
+                              </select>
                       </div>
                       <div class="mx-2">
                         <button type='submit'class="btn btn-primary"><i class="fa fa-search mx-1"></i>@lang('site.search')</button>
@@ -62,6 +69,7 @@
                                 <th>@lang('site.purchase_price')</th>
                                 <th>@lang('site.sale_price')</th>
                                 <th>@lang('site.stock')</th>
+                                <th>@lang('site.profit_percent')</th>
                                 <th>@lang('site.action')</th>
 
                             </tr>
@@ -78,6 +86,7 @@
                                     <td>{{ $product->purchase_price }}</td>
                                     <td>{{ $product->sale_price }}</td>
                                     <td>{{ $product->stock }}</td>
+                                    <td>{{ $product->gains }}</td>
                                     <td>
                                     @if (auth()->user()->haspermission('update_products'))
                                        <a href="{{ route('dashboard.product.edit', $product->id) }}" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> @lang('site.edit')</a>

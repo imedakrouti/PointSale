@@ -5,6 +5,7 @@ namespace App\Http\Controllers\dashboard;
 use App\Http\Controllers\Controller;
 use App\Product;
 use App\Category;
+use App\ProductTranslation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
@@ -17,10 +18,20 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
+
     {
-        $products=product::with('category')->paginate(5);
-        return view('dashboard.product.index')->with(['products'=>$products]);
+      $categories=category::all('id');
+      $products = Product::when($request->table_search, function ($q) use ($request) {
+
+        return $q->whereTranslationLike('name', '%' . $request->table_search . '%');
+
+    })->when($request->category_id, function ($q) use ($request) {
+
+        return $q->where('category_id', $request->category_id);
+
+    })->latest()->with('category')->paginate(5);
+        return view('dashboard.product.index')->with(['products'=>$products,'categories'=>$categories]);
     }
 
     /**
@@ -44,9 +55,9 @@ class ProductController extends Controller
     {
         //dd($request);
         $rules = [
-            'category' => 'required'
+            'category_id' => 'required'
         ];
-       
+
         foreach (config('translatable.locales') as $locale) {
 
             $rules += [$locale . '.name' => 'required|unique:product_translations,name'];
@@ -61,6 +72,7 @@ class ProductController extends Controller
         ];
 
         $request->validate($rules);
+        $product_data=$request->all();
         if ($request->image) {
 
             Image::make($request->image)
@@ -68,28 +80,26 @@ class ProductController extends Controller
                     $constraint->aspectRatio();
                 })
                 ->save(public_path('uploads/product-images/' . $request->image->hashName()));
-
-          
-
+                $product_data['image']=$request->image->hashName();
         }//end of if
-      //  dd($product_data['category_id']);
-       
-        $product_data= [
-            'ar' => [
-                'name'       => ($request['ar']['name']),
-                'description'       => ($request['ar']['description']),
-            ],
-            'en' => [
-                'name'       => ($request['en']['name']),
-                'description'       => ($request['en']['description']),
-                        ],
-         ];
+       // $product_data['category_id']=$request->category;
 
-         $product_data['purchase_price']=$request->purchase_price;
-         $product_data['sale_price']=$request->sale_price;
-         $product_data['stock']=$request->stock;
-         $product_data['category_id']=$request->category;
-         $product_data['image'] = $request->image->hashName();
+        // $product_data= [
+        //     'ar' => [
+        //         'name'       => ($request['ar']['name']),
+        //         'description'       => ($request['ar']['description']),
+        //     ],
+        //     'en' => [
+        //         'name'       => ($request['en']['name']),
+        //         'description'       => ($request['en']['description']),
+        //                 ],
+        //  ];
+
+        //  $product_data['purchase_price']=$request->purchase_price;
+        //  $product_data['sale_price']=$request->sale_price;
+        //  $product_data['stock']=$request->stock;
+        //  $product_data['category_id']=$request->category;
+        //  $product_data['image'] = $request->image->hashName();
       //  dd($product_data['purchase_price']);
         // product::create([
         //     'ar' => [
@@ -132,7 +142,8 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
-        //
+        $categories = Category::all();
+        return view('dashboard.product.edit', compact('categories', 'product'));
     }
 
     /**
@@ -144,9 +155,65 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        //
-    }
+        $rules = [
+            'category_id' => 'required'
+        ];
 
+        foreach (config('translatable.locales') as $locale) {
+
+            $rules += [$locale . '.name' => ['required', Rule::unique('product_translations', 'name')->ignore($product->id, 'product_id')]];
+            $rules += [$locale . '.description' => 'required'];
+
+        }//end of  for each
+
+        $rules += [
+            'purchase_price' => 'required',
+            'sale_price' => 'required',
+            'stock' => 'required',
+        ];
+        $product_data=$request->all();
+       // dd($product_data);
+        $request->validate($rules);
+        if ($request->image) {
+
+            if ($product->image != 'default.png') {
+
+                Storage::disk('public_upload')->delete('/product-images/' . $product->image);
+
+            }//end of if
+
+            Image::make($request->image)
+                ->resize(300, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                })
+                ->save(public_path('uploads/product-images/' . $request->image->hashName()));
+                $product_data['image'] = $request->image->hashName();
+             }
+
+            //  $product_data= [
+            //     'ar' => [
+            //         'name'       => ($request['ar']['name']),
+            //         'description'       => ($request['ar']['description']),
+            //     ],
+            //     'en' => [
+            //         'name'       => ($request['en']['name']),
+            //         'description'       => ($request['en']['description']),
+            //                 ],
+            //  ];
+
+            //  $product_data['purchase_price']=$request->purchase_price;
+            //  $product_data['sale_price']=$request->sale_price;
+            //  $product_data['stock']=$request->stock;
+            //  $product_data['category_id']=$request->category;
+
+
+            // dd($product_data['image']);
+             $product->update($product_data);
+             toast(__('site.added_successfully'), 'success')->position('left', 'left')->background('#ddd');
+             return  redirect(route('dashboard.product.index'));
+
+
+    }
     /**
      * Remove the specified resource from storage.
      *
@@ -155,6 +222,11 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        //
+        if ($product->image != 'default.png'){
+            storage::disk('public_upload')->delete('/product-images/'.$product->image);
+        }
+        $product->delete();
+        toast(__('site.deleted_successfully'),'success')->position('center','center')->background('#447');
+        return  redirect()->back();
     }
 }
