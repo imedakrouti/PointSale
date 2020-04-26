@@ -21,6 +21,9 @@ class Product extends Model
     public function getImagePathAttribute(){
         return asset('uploads/product-images/'.$this->image);
     }
+    public function sale_price(){
+        return $this->sale_price;
+    }
 
     public function category(){
         return $this->belongsTo(category::class);
@@ -39,7 +42,22 @@ class Product extends Model
     public function orders(){
 
         return $this->belongsToMany(order::class,'order_product');
-
 }
+public function scopeActive($query){
+
+    return $query->where('name','prod1');
+}
+public function scopeSearch($query,$request)
+    {
+        return $query->when($request->table_search, function ($q) use ($request) {
+            return $q->whereTranslationLike('name', '%' . $request->table_search . '%');
+
+        })->when($request->category_id, function ($q) use ($request) {
+
+            return $q->where('category_id', $request->category_id);
+
+        });
+    }
+
 
 }

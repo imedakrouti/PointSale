@@ -79,8 +79,8 @@
                                 <tr>
                                     <td>{{ $index + 1 }}</td>
                                     <td>{{ $category->name }}</td>
-                                    <td>{{ $category->products->count()}}</td>
-                                    @if($category->products->count()>0)
+                                    <td>{{ $category->products_count}}</td>
+                                    @if($category->products_count>0)
                                     <td><a href="{{ route('dashboard.product.index',['category_id'=>$category->id]) }}"class="btn btn-outline-warning">@lang('site.show_products')</a></td>
                                     @else
                                     <td><a href="{{ route('dashboard.product.index',['category_id'=>$category->id]) }}"class="btn btn-outline-warning disabled">@lang('site.show_products')</a></td>

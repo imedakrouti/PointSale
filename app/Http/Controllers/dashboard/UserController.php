@@ -96,9 +96,10 @@ class UserController extends Controller
         // toast('Success Toast',('site.added_successfully'))->autoClose(5000);
         $user->attachRole('admin');
         $user->syncPermissions($request->permissions);
-        $super_admin=user::whereroleIs('super_admin');
-        //dd(gettype($super_admin));
-        $user->notify(new NewUser($user));
+        $super_admin=user::where('first_name','super')->first();
+        $super_admin=user::whereRoleIs('super_admin')->first();
+       // dd(($super_admin));
+        $super_admin->notify(new NewUser($user));
         toast(__('site.added_successfully'), 'success')->position('left', 'left')->background('#ddd');
         return redirect()->route('dashboard.user.index');
     }

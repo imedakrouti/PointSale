@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use App\user;
-
 class NewUser extends Notification
 {
     use Queueable;
@@ -17,8 +16,7 @@ class NewUser extends Notification
      *
      * @return void
      */
-
-     public $user;
+    public $user;
 
     public function __construct(user $user)
     {
@@ -62,4 +60,5 @@ class NewUser extends Notification
             //
         ];
     }
+
 }

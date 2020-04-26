@@ -4,8 +4,9 @@ namespace App\Http\Controllers\dashboard;
 use App\Category;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
-
+use Illuminate\Support\Facades\DB;
 class CategoryController extends Controller
 {
     /**
@@ -15,12 +16,36 @@ class CategoryController extends Controller
      */
     public function index(Request $request)
     {
-        $categories=category::select('id')->with('products')->when($request->table_search, function ($query) use ($request) {
-                return $query->whereTranslationLike('name', '%' . $request->table_search . '%');
+        $categories=category::select('id')->withCount('products')->when($request->table_search, function ($query) use ($request) {
+                 $query->whereTranslationLike('name', '%' . $request->table_search . '%');
         })->when($request->date, function($query) use ($request) {
-            return $query->where('created_at','like',"%{$request->date}%");
+             $query->where('created_at','like',"%{$request->date}%");
         })->latest()->paginate(5);
-
+        //dd($categories);
+        /*
+         $category=category::find(1);
+        foreach ($category->products as $related) {
+           # code...
+       dd($related->sale_price);
+       }
+       $categories=category::has('products','>=',3)->paginate(3);
+       $categories=category::has('products')->paginate(3);
+       $categories=category::whereHas('products',function(builder $q){
+           $q->where([['image','!=','default.png'],['stock','<','120']]);
+       })->paginate(3);
+       $categories=category::whereHas('products',function($query){
+        $query->where('sale_price','>=',150);
+    },'=',2)->oldest()->paginate(3);
+    $categories=category::whereDoesntHave('products')->paginate();
+    $categories=category::whereDoesntHave('products')->whereTranslationLike('name','catetwo')->paginate();
+    $categories=category::whereDoesntHave('products',function(builder $q){
+        $q->whereDate('created_at','2020-04-22');
+    })->paginate(3);
+    $categories=category::whereDate('created_at','2020-04-22')->paginate(5);
+    $categories=category::wheretranslationLike('name','arabic')->paginate(5);
+    $categories=category::wheredoesntHave('products',function($q){
+        $q->whereBetween('stock',[120,130]);
+    })->paginate(5);*/
         return view('dashboard.category.index',compact('categories'));
     }
 

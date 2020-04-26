@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Intervention\Image\Facades\Image;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Builder;
+
 
 
 class ProductController extends Controller
@@ -25,14 +27,20 @@ class ProductController extends Controller
 
     {
       $categories=category::all('id');
-      $products=product::with('category')->when($request->table_search, function ($q) use ($request) {
+    /*   $products=product::with('category')->when($request->table_search, function ($q) use ($request) {
         return $q->whereTranslationLike('name', '%' . $request->table_search . '%');
 
     })->when($request->category_id, function ($q) use ($request) {
 
         return $q->where('category_id', $request->category_id);
 
-    })->latest()->with('category')->paginate(5);
+    })->latest()->paginate(5); */
+    $products=product::search($request)->paginate(5);
+    /* $products=product::wheredoesntHave('category',function(builder $query){
+         $query->wheretranslationLike('name','catone');
+    })->get();
+    $products=product::wheretranslationLike('name','imed')->orwheretranslationLike('name','prod1')->paginate();
+   */
         return view('dashboard.product.index')->with(['products'=>$products,'categories'=>$categories]);
     }
 
