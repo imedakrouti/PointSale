@@ -16,51 +16,54 @@ class ClientController extends Controller
      */
     public function index(Request $request)
     {
-   /*  $client=DB::table('clients')->pluck('name');
-    $client=client::pluck('name');
-    $client=client::orderBy('id','desc');
-    $client=DB::table('clients')->orderBy('id','desc');
-    $client=DB::table('clients')->orderBy('id','desc');
-    $client=client::count();
-    $client=client::avg('id');
-    $client=client::min('id');
-    $client=client::where('id',1)->avg('id');
-
+        //$client=DB::table('clients')->pluck('name');
+       // $client=client::pluck('name');
+      // $client=client::orderBy('id','desc');
+       //$client=DB::table('clients')->orderBy('id','desc');
+       //$client=DB::table('clients')->orderBy('id','desc');
+    //    $client=client::count();
+    //    $client=client::avg('id');
+    //    $client=client::min('id');
+    //    $client=client::where('id',1)->avg('id');
+    /*
     $client=DB::table('clients')->count();
     $client=DB::table('clients')->max('id');
     $client=DB::table('clients')->min('id');
     $client=DB::table('clients')->avg('id');
-
- $client=DB::table('clients')->where('id',10)->exists();
-    $client=client::where('id',10)->exists();
- $client=client::where('id',10)->doesntExist();
-    DB::table('clients')->insert(['name'=>'malek','phone'=>'23741780','adress'=>'citeElOns']);
-    $client=DB::table('clients')->orderBy('id','desc')->paginate(3);
-     $client=DB::table('clients')->whereId(1)->pluck("name");
-
-
-       $client=DB::table('clients')->select('name')->distinct()->get();
-       $client=client::select('name')->distinct()->get();
-       $client=client::select('name')->whereBetween('name',['a','g'])->get();
-       $client=DB::table('clients')->select('name')->whereNotBetween('name',['a','g'])->get();
-       $client=DB::table('clients')->pluck('id');
-       $client=client::whereIn('id',[1,2])->get();
-       $client=DB::table('clients')->whereIn('name',['a','malek'])->get();
-         dd($client,gettype($client));
-       foreach ($client as $value){
-          echo $value->name, '<br>';
-
-     }
-     $client=DB::table('clients')->whereId('4')->pluck('name');
-     $id=$client->id;
-     dd($client);
+    */
+    // $client=DB::table('clients')->where('id',10)->exists();
+    // $client=client::where('id',10)->exists();
+    // $client=client::where('id',10)->doesntExist();
+        //DB::table('clients')->insert(['name'=>'malek','phone'=>'23741780','adress'=>'citeElOns']);
+       //$client=DB::table('clients')->orderBy('id','desc')->paginate(3);
+    // $client=DB::table('clients')->whereId(1)->pluck("name");
 
 
-     $client=client::whereIn('name',['client1','ahmed'])->update(['name'=>'imed']);
-     $client=client::whereIn('name',['client1','ahmed'])->delete;
-     dd($client);*/
-     
-        /*
+       // $client=DB::table('clients')->select('name')->distinct()->get();
+     //  $client=client::select('name')->distinct()->get();
+    //     $client=client::select('name')->whereBetween('name',['a','g'])->get();
+    //     $client=DB::table('clients')->select('name')->whereNotBetween('name',['a','g'])->get();
+    //     // $client=DB::table('clients')->pluck('id');
+    //     // $client=client::whereIn('id',[1,2])->get();
+    //      $client=DB::table('clients')->whereIn('name',['a','malek'])->get();
+    //     //dd($client,gettype($client));
+    //   foreach ($client as $value){
+    //      echo $value->name, '<br>';
+
+    //  }
+    // $client=DB::table('clients')->whereId('4')->pluck('name');
+    // //$id=$client->id;
+    // //dd($client);
+
+
+    //   // $client=client::whereIn('name',['client1','ahmed'])->update(['name'=>'imed']);
+    //   // $client=client::whereIn('name',['client1','ahmed'])->delete;
+    //   // dd($client);
+    // //    $clients=client::select('id','name','phone','adress')->when($request->table_search,function($q) use($request){
+    // //        return $q->where('name','like',"%{$request->table_search}%")
+                       ->orwhere('phone','like',"%{$request->table_search}%")
+                       ->orwhere('adress','like',"%{$request->table_search}%");
+        })->latest()->paginate(2);
      $clients=DB::table('clients')->select('id','name','phone','adress')->when($request->table_search,function($q) use($request){
          return $q->where('name','==',"%{$request->table_search}%")
                   ->orwhere('phone','like',"%{$request->table_search}%")
@@ -115,12 +118,7 @@ class ClientController extends Controller
             dd($client);
             $clients=client::where('id',1)->get();
             $clients=DB::table('clients')->limit(7)->get();
-      dd($clients); */
-      $clients=client::select('id','name','phone','adress')->when($request->table_search,function($q) use($request){
-        return $q->where('name','like',"%{$request->table_search}%")
-                     ->orwhere('phone','like',"%{$request->table_search}%")
-                     ->orwhere('adress','like',"%{$request->table_search}%");
-      })->latest()->paginate(2);
+      dd($clients);
         return view('dashboard.client.index')->with(['clients'=>$clients]);
     }
 

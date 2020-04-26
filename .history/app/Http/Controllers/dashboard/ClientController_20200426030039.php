@@ -58,9 +58,12 @@ class ClientController extends Controller
 
      $client=client::whereIn('name',['client1','ahmed'])->update(['name'=>'imed']);
      $client=client::whereIn('name',['client1','ahmed'])->delete;
-     dd($client);*/
-     
-        /*
+     dd($client);
+      $clients=client::select('id','name','phone','adress')->when($request->table_search,function($q) use($request){
+          return $q->where('name','like',"%{$request->table_search}%")
+                       ->orwhere('phone','like',"%{$request->table_search}%")
+                       ->orwhere('adress','like',"%{$request->table_search}%");
+        })->latest()->paginate(2);
      $clients=DB::table('clients')->select('id','name','phone','adress')->when($request->table_search,function($q) use($request){
          return $q->where('name','==',"%{$request->table_search}%")
                   ->orwhere('phone','like',"%{$request->table_search}%")
@@ -116,11 +119,6 @@ class ClientController extends Controller
             $clients=client::where('id',1)->get();
             $clients=DB::table('clients')->limit(7)->get();
       dd($clients); */
-      $clients=client::select('id','name','phone','adress')->when($request->table_search,function($q) use($request){
-        return $q->where('name','like',"%{$request->table_search}%")
-                     ->orwhere('phone','like',"%{$request->table_search}%")
-                     ->orwhere('adress','like',"%{$request->table_search}%");
-      })->latest()->paginate(2);
         return view('dashboard.client.index')->with(['clients'=>$clients]);
     }
 

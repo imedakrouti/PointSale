@@ -25,7 +25,7 @@ class ProductController extends Controller
 
     {
       $categories=category::all('id');
-      $products=product::with('category')->when($request->table_search, function ($q) use ($request) {
+      $products =DB::table('products')->with('category')->when($request->table_search, function ($q) use ($request) {
         return $q->whereTranslationLike('name', '%' . $request->table_search . '%');
 
     })->when($request->category_id, function ($q) use ($request) {
