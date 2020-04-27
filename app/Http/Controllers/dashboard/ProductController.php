@@ -84,7 +84,7 @@ class ProductController extends Controller
         $request->validate($rules);
         $product_data=$request->all();
         if ($request->image) {
-
+            
             Image::make($request->image)
                 ->resize(300, null, function ($constraint) {
                     $constraint->aspectRatio();

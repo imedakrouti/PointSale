@@ -149,28 +149,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <li class="nav-item dropdown">
         <a class="nav-link" data-toggle="dropdown" href="#">
           <i class="fa fa-bell-o"></i>
-          <span class="badge badge-warning navbar-badge">15</span>
+          <span class="badge badge-warning navbar-badge">{{ auth()->user()->unreadNotifications->count()>0 ?? '' }}</span>
         </a>
         <div class="dropdown-menu dropdown-menu-lg dropdown-menu-left">
-          <span class="dropdown-item dropdown-header">15 نوتیفیکیشن</span>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fa fa-envelope ml-2"></i> 4 پیام جدید
-            <span class="float-left text-muted text-sm">3 دقیقه</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fa fa-users ml-2"></i> 8 درخواست دوستی
-            <span class="float-left text-muted text-sm">12 ساعت</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item">
-            <i class="fa fa-file ml-2"></i> 3 گزارش جدید
-            <span class="float-left text-muted text-sm">2 روز</span>
-          </a>
-          <div class="dropdown-divider"></div>
-          <a href="#" class="dropdown-item dropdown-footer">مشاهده همه نوتیفیکیشن</a>
-        </div>
+          <span class="dropdown-item dropdown-header">{{ auth()->user()->unreadNotifications->count()>0 ?? '' }}</span>
+         @foreach (auth()->user()->notifications as $notifications)
+         {{ $notifications->markAsRead() }}
+         <div class="dropdown-divider"></div>
+         <a href="{{ route('dashboard.user.show',$notifications->data['user']['id']) }}" class="dropdown-item"> 
+           <img src="{{$notifications->data['user']['path_image']}}" alt="">
+           <span class="float-left text-muted text-sm">{{ $notifications->type=='App\Notifications\NewUser' ? 'New user': '' }}</span>
+         </a>
+         @endforeach
+         
+       
       </li>
                   <!-- lang item -->
       <li class="nav-item dropdown">

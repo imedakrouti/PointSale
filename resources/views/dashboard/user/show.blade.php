@@ -25,9 +25,6 @@
             <div class="card card-primary card-outline">
               <div class="card-header">
               <h3 class="card-title mb-2"><i class="fa fa-user"></i> @lang('site.users')
-                @if($users->total() > 0 )
-                <span class="badge badge-info mx-2" >{{$users->total()}}</span>
-                @endif
                 @if (auth::user()->hasPermission('create_users'))
                 <a href="{{route('dashboard.user.create')}}" class="btn btn-success float-left  rounded "><i class="fa fa-plus mx-1"></i>@lang('site.add')</a>
                 @else
@@ -48,12 +45,12 @@
                       </div>
                     </div>
                     </form>
-                 @if ($users->count() > 0)
+               
                  <div class="table-responsive">
                  <table id="example2" class="table table-bordered table-hover">
                     <thead class="bg-primary">
                             <tr>
-                                <th>#</th>
+                               
                                 <th>@lang('site.first_name')</th>
                                 <th>@lang('site.last_name')</th>
                                 <th>@lang('site.email')</th>
@@ -63,18 +60,14 @@
                             </thead>
 
                             <tbody>
-                            @foreach ($users as $index=>$user)
                                 <tr>
-                                    <td>{{ $index + 1 }}</td>
                                     <td>{{ $user->first_name }}</td>
                                     <td>{{ $user->last_name }}</td>
                                     <td>{{ $user->email }}</td>
                                     <td class=""><img src="{{ $user->path_image }}" alt="User Avatar" width="100px"heght="100px" class="mr-3 img-circle">
                                     </td>
                                     <td>
-                                    @if (auth()->user()->haspermission('read_users'))
-                                       <a href="{{ route('dashboard.user.show', $user->id) }}" class="btn btn-primary btn-sm"><i class="fa fa-eye"></i> @lang('site.show')</a>
-                                       @endif
+                                  
                                     @if (auth()->user()->haspermission('update_users'))
                                        <a href="{{ route('dashboard.user.edit', $user->id) }}" class="btn btn-warning btn-sm"><i class="fa fa-edit"></i> @lang('site.edit')</a>
                                     @else
@@ -93,21 +86,14 @@
                                     </td>
                                 </tr>
 
-                            @endforeach
+                           
                             </tbody>
 
                         </table>
                  </div>
-                        <p>
-                            {{ $users->appends(request()->query())->links() }}
+                     
 
-                        </p>
-
-                        <!-- end of table -->
-                    @else
-                        <h2>@lang('site.no_data_found')</h2>
-
-                    @endif
+                
               </div>
               <!-- /.card-body -->
             </div>

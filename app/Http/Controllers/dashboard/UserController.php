@@ -25,10 +25,10 @@ class UserController extends Controller
     public function __construct()
     {
         //create read update delete
-        // $this->middleware(['permission:read_users'])->only('index');
-        // $this->middleware(['permission:create_users'])->only('create');
-        // $this->middleware(['permission:update_users'])->only('edit');
-        // $this->middleware(['permission:delete_users'])->only('destroy');
+        $this->middleware(['permission:read_users'])->only('index');
+        $this->middleware(['permission:create_users'])->only('create');
+        $this->middleware(['permission:update_users'])->only('edit');
+        $this->middleware(['permission:delete_users'])->only('destroy');
     } //end of constructor
 
     public function index(Request $request)
@@ -42,6 +42,7 @@ class UserController extends Controller
         // }
            // $super_admin=user::whereroleIs('super_admin')->get();
             //dd($super_admin);
+            dd(auth()->user()->notifications->first()->data['user']['path_image']);
         $users =user::select('id','first_name','last_name','email','image')->whereroleIs('admin')->where(function ($q) use ($request) {
             return $q->when($request->table_search, function ($query) use ($request) {
                 return $query->where('first_name', 'like', '%' . $request->table_search . '%')
@@ -91,6 +92,9 @@ class UserController extends Controller
          })->save(public_path('uploads/user-images/'.$request->image->hashName()));
          $data_user['image']=$request->image->hashName();
         }
+        else{
+            $data_user['image']="default.png";
+        }
         $user = user::create($data_user);
         // session()->flash('success', );
         // toast('Success Toast',('site.added_successfully'))->autoClose(5000);
@@ -112,7 +116,7 @@ class UserController extends Controller
      */
     public function show(user $user)
     {
-        //
+        return view ('dashboard.user.show')->with(['user'=>$user]);
     }
 
     /**

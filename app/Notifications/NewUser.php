@@ -16,6 +16,7 @@ class NewUser extends Notification
      *
      * @return void
      */
+
     public $user;
 
     public function __construct(user $user)
@@ -31,7 +32,7 @@ class NewUser extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail'];
+        return ['mail','database'];
     }
 
     /**
@@ -57,7 +58,7 @@ class NewUser extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
+            'user'=>$this->user
         ];
     }
 
